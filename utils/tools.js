@@ -6,11 +6,11 @@ module.exports = {
     return new Promise((resolve, reject) => {
       let xmlData = '';
        
-      req.
-        on('data', data => {
+      req
+        .on('data', (data) => {
           xmlData += data.toString();
         })
-          .on('end', () => {
+        .on('end', () => {
           resolve(xmlData);
         })
     })
@@ -25,11 +25,12 @@ module.exports = {
         jsData = {};
       }
     })
+    return jsData;
   },
 
   formatJsData (jsData) {
     const {xml} = jsData;
-    let userData = {};
+    const userData = {};
     for (let key in xml) {
       const value = xml[key];
       userData[key] = value[0];

@@ -1,5 +1,6 @@
 const sha1 = require('sha1');
 const { getUserDataAsync, parseXMLData, formatJsData } = require('../utils/tools');
+const template = require('./template');
 
 module.exports = () => {
   return async (req, res) => {
@@ -12,7 +13,7 @@ module.exports = () => {
     const token = 'atguiguHTML1128';
   
     const sha1Str = sha1([ token, timestamp, nonce ].sort().join(''));
-  
+    
     if ( req.method === 'GET' ) {
       if (sha1Str === signature) {
         res.end(echostr);
@@ -25,27 +26,35 @@ module.exports = () => {
         return;
       }
       
+      
       const xmlData = await getUserDataAsync(req);
        
       const jsData = parseXMLData(xmlData);
   
-      const {xml} = formatJsData(jsData);
-  
-      let content = '你在说什么？我听不懂';
-      if (userData.Content === '1') {
-        content = '大吉大利，今晚吃鸡';
-      } else if (userData.Content.indexOf('2') !== -1) {
-        content = '你属什么? <br> 我属于你';
+      const userData = formatJsData(jsData);
+
+      let options = {
+        toUserName : userData.FromUserName,
+        fromUserName : userData.ToUserName,
+        createTime : Date.now(),
+        type : 'text', 
+        content : '你在说什么？我听不懂',
       }
   
-      let replyMessage = `<xml>
-      <ToUserName><![CDATA[${userData.FromUserName}]]></ToUserName>
-      <FromUserName><![CDATA[${userData.ToUserName}]]></FromUserName>
-      <CreateTime>${Date.now()}</CreateTime>
-      <MsgType><![CDATA[text]]></MsgType>
-      <Content><![CDATA[${content}]]></Content>
-      </xml>`
-    res.send(replyMessage);
+      if (userData.Content === '1') {
+        options.content = '大吉大利，今晚吃鸡';
+      } else if (userData.Content && userData.Content.indexOf('2') !== -1) {
+        options.content = '你属什么? <br> 我属于你';
+      }
+  
+      if (userData.MsgType === 'image') {
+        options.mediaId = userData.MediaId;
+        options.type = 'image';
+      }
+
+      const replyMessage = template(options);
+      console.log(replyMessage)
+      res.send(replyMessage);
   
     } else {
       res.end('error');
