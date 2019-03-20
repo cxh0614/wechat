@@ -1,6 +1,7 @@
 const sha1 = require('sha1');
 const { getUserDataAsync, parseXMLData, formatJsData } = require('../utils/tools');
 const template = require('./template');
+const handleResponse = require('./handleResponse');
 
 module.exports = () => {
   return async (req, res) => {
@@ -33,24 +34,7 @@ module.exports = () => {
   
       const userData = formatJsData(jsData);
 
-      let options = {
-        toUserName : userData.FromUserName,
-        fromUserName : userData.ToUserName,
-        createTime : Date.now(),
-        type : 'text', 
-        content : '你在说什么？我听不懂',
-      }
-  
-      if (userData.Content === '1') {
-        options.content = '大吉大利，今晚吃鸡';
-      } else if (userData.Content && userData.Content.indexOf('2') !== -1) {
-        options.content = '你属什么? <br> 我属于你';
-      }
-  
-      if (userData.MsgType === 'image') {
-        options.mediaId = userData.MediaId;
-        options.type = 'image';
-      }
+      const options = handleResponse(userData);
 
       const replyMessage = template(options);
       console.log(replyMessage)
