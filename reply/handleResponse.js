@@ -11,7 +11,7 @@ module.exports = (userData) => {
     if (userData.Content === '1') {
       options.content = '大吉大利，今晚吃鸡';
     } else if (userData.Content && userData.Content.indexOf('2') !== -1) {
-      options.content = '你属什么? <br> 我属于你';
+      options.content = '你属什么? \n 我属于你';
     }
   } else if (userData.MsgType === 'voice') {
     options.content = userData.Recognition;
