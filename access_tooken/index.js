@@ -1,5 +1,7 @@
-const fetchAccessToken = require('./access_token');
-const rq = require('request-promise-native');
+const fetchAccessToken = require('./access-token');
+const rp = require('request-promise-native');
+
+const URL_PREFIX = 'https://api.weixin.qq.com/cgi-bin/';
 
 const menu = {
   "button":[
@@ -58,9 +60,9 @@ const menu = {
 
 async function createMenu() {
   const { access_token } = await fetchAccessToken();
-  const url = ` https://api.weixin.qq.com/cgi-bin/menu/create?access_token=${access_token}`;
+  const url = ` ${URL_PREFIX}menu/create?access_token=${access_token}`;
 
-  const result = rq({method: 'POST', url, json: true, body: menu});
+  const result = rp({method: 'POST', url, json: true, body: menu});
 
   return result;
 }
@@ -68,16 +70,41 @@ async function createMenu() {
 
 async function deleteMenu() {
   const { access_token } = await fetchAccessToken();
-  const url = ` https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=${access_token}`;
+  const url = ` ${URL_PREFIX}menu/delete?access_token=${access_token}`;
 
-  const result = rq({method: 'GET', url, json: true});
+  const result = await rp({method: 'GET', url, json: true});
 
   return result;
 }
 
+async function createTag(name) {
+  const { access_token } = await fetchAccessToken();
+  const url = ` ${URL_PREFIX}tags/create?access_token=${access_token}`;
+
+  return await rp({method: 'POST', url, json: true, body: {tag: {name} }});
+}
+
+async function getTagUsers (tagid, next_openid = '') {
+  const { access_token } = await fetchAccessToken();
+  const url = ` ${URL_PREFIX}user/tag/get?access_token=${access_token}`;
+
+  return await rp({method: 'POST', url, json: true, body: {tagid, next_openid}});
+}
+
+async function batchUsersTag (openid_list, tagid) {
+  const { access_token } = await fetchAccessToken();
+  const url = ` ${URL_PREFIX}tags/members/batchtagging?access_token=${access_token}`;
+
+  return await rp({method: 'POST', url, json: true, body: {openid_list, tagid}});
+}
+
 (async () => {
-  let result = await deleteMenu();
-  console.log(result);
-  result = await createMenu();
-  console.log(result);
+  let result1 = await createTag('01');
+  console.log(result1);
+  let result2 = await batchUsersTag([
+    'odth_5p2SdDmVhbVrtm7ZILprZMs'
+  ], result1.tag.id);
+  console.log(result2);
+  let result3 = await getTagUsers(result1.tag.id);
+  console.log(result3);
 })()

@@ -1,4 +1,6 @@
 const { parseString } = require('xml2js');
+const { writeFile, readFile } = require('fs');
+const { resolve } = require('path');
 
 module.exports = {
 
@@ -36,5 +38,31 @@ module.exports = {
       userData[key] = value[0];
     }
     return userData;
-  }
+  },
+
+  writeFileAsync (filePath, data) {
+    filePath = resolve(__dirname, '../access_tooken', filePath);
+    return new Promise((resolve, reject) => {
+      writeFile(filePath, JSON.stringify(data), err => {
+        if (!err) resolve();
+        else reject(err)
+      });
+    })
+  },
+
+  readFileAsync (filePath) {
+    filePath = resolve(__dirname, '../access_tooken', filePath);
+    return new Promise((resolve, reject) => {
+      readFile(filePath, (err, data) => {
+        if (!err) {
+          resolve(JSON.parse(data.toString()));
+        } else {
+          reject(err);
+        }
+      })
+    })
+  },
+
+
+
 }

@@ -25,7 +25,7 @@ module.exports = () => {
       if (sha1Str !== signature) {
         res.end('error');
         return;
-      }
+      } 
       
       
       const xmlData = await getUserDataAsync(req);

@@ -10,7 +10,7 @@ module.exports = (userData) => {
   if (userData.MsgType === 'text') {
     if (userData.Content === '1') {
       options.content = '大吉大利，今晚吃鸡';
-    } else if (userData.Content && userData.Content.indexOf('2') !== -1) {
+    } else if (userData.Content.indexOf('2') !== -1) {
       options.content = '你属什么? \n 我属于你';
     }
   } else if (userData.MsgType === 'voice') {
@@ -31,6 +31,9 @@ module.exports = (userData) => {
     }
   } else if (userData.Event === 'CLICK') {
     options.content = '用户点击了菜单';
+    if (userData.EventKey === 'home') {
+      options.content = '用户点击了home菜单';
+    }
   }
 
   

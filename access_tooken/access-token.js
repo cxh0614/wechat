@@ -1,5 +1,5 @@
 const rp = require('request-promise-native');
-const { writeFile, readFile } = require('fs')
+const { writeFileAsync, readFileAsync } =require('../utils/tools');
 
 async function getAccessToken () {
   const appid = 'wxa7d0e8434f3a9581';
@@ -11,24 +11,12 @@ async function getAccessToken () {
 
   result.expires_in = Date.now() + 7200000 - 300000;
 
-  writeFile('./accessToken.txt', JSON.stringify(result), err => {
-    if (!err) console.log('文件保存成功~');
-    else console.log(err)
-  });
-
+  await writeFileAsync('./access_tooken.txt', result);
   return result;
 }
 
 module.exports = function fetchAccessToken () {
-  return new Promise((resolve, reject) => {
-    readFile('./accessToken', (err, data) => {
-      if (!err) {
-        resolve(data);
-      } else {
-        reject(err);
-      }
-    })
-  })
+  return readFileAsync ('./access_tooken.txt')
   .then(res => {
     if (res.expires_in < Date.now()) {
       return getAccessToken();
